@@ -298,7 +298,17 @@ ENDFOREACH(subdir)
 
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
 
-if (NOT ${GEMMI_DIR} STREQUAL "")
+# Default to the vendored gemmi under third_party/ if GEMMI_DIR was not
+# provided on the command line. Note that the gemmi in that directory must be
+# built in place first (see BUILDING.md), because the include and library
+# paths below point into the same tree.
+if ("${GEMMI_DIR}" STREQUAL "")
+    if (EXISTS "${CMAKE_SOURCE_DIR}/third_party/gemmi-0.6.2/CMakeLists.txt")
+        set(GEMMI_DIR "${CMAKE_SOURCE_DIR}/third_party/gemmi-0.6.2")
+    endif ()
+endif ()
+
+if (NOT "${GEMMI_DIR}" STREQUAL "")
     include_directories("${GEMMI_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
     link_directories("${GEMMI_DIR}/${CMAKE_INSTALL_LIBDIR}")
 endif ()
