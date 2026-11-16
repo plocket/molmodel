@@ -103,6 +103,16 @@ find_package(ZLIB REQUIRED)
 
 GET_SIMBODY_VERSION(${Simbody_VERSION})
 
+# Simbody 3.7 and older have a bug that segfaults 25 of the 37 tests
+# (SimTK::State copy, see docs/DECISION-simbody-3.9.md). 3.8 and 3.9 are
+# verified working; 3.9 is the version the from-source path pins, and
+# TestNoseHooverThermostat behaves differently below it.
+if (${Simbody_VERSION} VERSION_LESS 3.8)
+    message(FATAL_ERROR "Simbody 3.8 or newer is required (found ${Simbody_VERSION}). Older versions crash most tests. See docs/DECISION-simbody-3.9.md.")
+elseif (${Simbody_VERSION} VERSION_LESS 3.9)
+    message(WARNING "Simbody ${Simbody_VERSION} found; 3.9 is the tested version (see docs/DECISION-simbody-3.9.md). Some tests are expected to fail.")
+endif ()
+
 include_directories(SYSTEM ${Simbody_INCLUDE_DIR})
 include_directories(SYSTEM ${OpenMM_INCLUDE_DIR})
 include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})

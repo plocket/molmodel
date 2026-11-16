@@ -1,7 +1,10 @@
 # Plan: pinned-from-source build
 
-Status: segfault investigation done (2025-11). Results below under
-"Segfault verification". Rest of plan not started.
+Status: segfault investigation done; Simbody 3.9 chosen
+(docs/DECISION-simbody-3.9.md). Done: CMake version check, pinned
+Dockerfile (verified with docker build/run), setup.sh rewritten to match
+Dockerfile policy, BUILDING.md updated. Not started: CI workflow,
+OpenMM pinning.
 
 ## Segfault verification
 
@@ -27,16 +30,40 @@ configure output.
 Results: 35/37 tests pass (baseline with 3.7 was 12/37). All 25
 segfaults gone. Remaining failures, both assertion failures, not crashes:
 
-- TestPdb: fails identically on 3.7 and 3.9. Round-trip string
+- TestPdb: fails identically on 3.7, 3.8, and 3.9. Round-trip string
   comparison in tests/TestPdb.cpp:73, in molmodel's own recently
   modified writePdb code. Unrelated to Simbody version.
-- TestNoseHooverThermostat: new failure with 3.9 only. Physics
-  tolerance assertion (mean energy at tolerance 0.2). Behavioral
-  difference in newer Simbody; needs investigation if 3.9 is adopted.
+- TestNoseHooverThermostat: fails on 3.8 and 3.9, passes on 3.7.
+  Physics tolerance assertion (mean energy at tolerance 0.2). Behavior
+  change in the thermostat arrived in 3.8 and is unchanged in 3.9.
 
-Conclusion: pin Simbody 3.9 (or verify 3.8 too if 3.9's thermostat
-change is a problem). This removes the main argument for staying on
-apt Simbody.
+## Simbody 3.8 verification (done after 3.9)
+
+Built Simbody-3.8 the same way as 3.9. Result: 34/37 pass. Failures:
+TestDuMMForces (new, see below), TestNoseHooverThermostat, TestPdb.
+
+TestDuMMForces fails on 3.8 only, with:
+
+    System::Guts::updDefaultState(): System MultibodySystem topology has
+    not been realized since the last topological change -- you must call
+    realizeTopology() first.
+
+Interpretation: Simbody 3.8 added stricter state validation and molmodel
+calls updDefaultState() at a point 3.7 silently permitted. 3.9 passes
+this test again (check relaxed or fixed upstream). So 3.8 is the
+strictest release for this codebase; 3.9 dominates it.
+
+## Version comparison table
+
+| Simbody | pass | failures |
+|---------|------|----------|
+| 3.7 (apt) | 12/37 | 25 segfaults in libSimTKcommon State copy |
+| 3.8 (source) | 34/37 | TestDuMMForces (realizeTopology strictness), TestNoseHooverThermostat (tolerance), TestPdb (molmodel's own) |
+| 3.9 (source) | 35/37 | TestNoseHooverThermostat (tolerance), TestPdb (molmodel's own) |
+
+Conclusion: pin Simbody 3.9. It has the fewest failures of the three,
+and 3.8's extra failure indicates molmodel relies on state handling
+that only 3.9 permits without complaint.
 
 ## Goal
 

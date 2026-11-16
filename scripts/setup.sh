@@ -2,43 +2,66 @@
 # Build molmodel and its dependencies on a Debian/Ubuntu system.
 # Requires: sudo apt, git, curl, a C++ compiler.
 # See BUILDING.md for what this does and for non-Debian alternatives.
+#
+# Dependency policy (matches the Dockerfile):
+# - Simbody 3.9 and gemmi 0.6.2 from pinned source releases
+#   (docs/DECISION-simbody-3.9.md explains why 3.9)
+# - OpenMM from apt (pinning deferred, see docs/PLAN-pinned-build.md)
 
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
+SIMBODY_VERSION=3.9
 GEMMI_VERSION=0.6.2
-GEMMI_DIR="third_party/gemmi-${GEMMI_VERSION}"
 
 # 1. System packages
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential cmake git curl \
     libblas-dev liblapack-dev zlib1g-dev \
-    libsimbody-dev libopenmm-dev
+    libopenmm-dev
 
-# 2. Fetch gemmi if not already present
-if [ ! -d "${GEMMI_DIR}" ]; then
+# 2. gemmi 0.6.2 from pinned source (molmodel requires 0.6.x)
+if [ ! -d "third_party/gemmi-${GEMMI_VERSION}" ]; then
     mkdir -p third_party
     curl -sL "https://github.com/project-gemmi/gemmi/archive/refs/tags/v${GEMMI_VERSION}.tar.gz" \
         -o /tmp/gemmi-${GEMMI_VERSION}.tar.gz
     tar -xzf /tmp/gemmi-${GEMMI_VERSION}.tar.gz -C third_party/
     rm /tmp/gemmi-${GEMMI_VERSION}.tar.gz
 fi
-
-# 3. Build gemmi in place (molmodel links against this tree)
-cmake -S "${GEMMI_DIR}" -B "${GEMMI_DIR}" \
+cmake -S "third_party/gemmi-${GEMMI_VERSION}" -B "third_party/gemmi-${GEMMI_VERSION}" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=ON \
     -DUSE_PYTHON=OFF
-cmake --build "${GEMMI_DIR}" -j"$(nproc)"
-sudo cmake --install "${GEMMI_DIR}"
+cmake --build "third_party/gemmi-${GEMMI_VERSION}" -j"$(nproc)"
+sudo cmake --install "third_party/gemmi-${GEMMI_VERSION}"
+
+# 3. Simbody from pinned source. Ubuntu's packaged Simbody (3.7) crashes
+#    most of molmodel's test suite; see docs/DECISION-simbody-3.9.md.
+if [ ! -d "third_party/simbody-Simbody-${SIMBODY_VERSION}" ]; then
+    mkdir -p third_party
+    curl -sL "https://github.com/simbody/simbody/archive/refs/tags/Simbody-${SIMBODY_VERSION}.tar.gz" \
+        -o /tmp/simbody-${SIMBODY_VERSION}.tar.gz
+    tar -xzf /tmp/simbody-${SIMBODY_VERSION}.tar.gz -C third_party/
+    rm /tmp/simbody-${SIMBODY_VERSION}.tar.gz
+fi
+cmake -S "third_party/simbody-Simbody-${SIMBODY_VERSION}" \
+      -B "third_party/simbody-Simbody-${SIMBODY_VERSION}" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_TESTING=OFF
+cmake --build "third_party/simbody-Simbody-${SIMBODY_VERSION}" -j"$(nproc)"
+sudo cmake --install "third_party/simbody-Simbody-${SIMBODY_VERSION}"
 sudo ldconfig
 
-# 4. Configure and build molmodel
-# GEMMI_DIR no longer needs to be passed: CMakeLists.txt defaults to
-# third_party/gemmi-0.6.2 when it is unset.
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+# 4. Configure and build molmodel.
+# GEMMI_DIR defaults to third_party/gemmi-0.6.2 in CMakeLists.txt.
+# Simbody_DIR is passed explicitly so the freshly built 3.9 is used
+# rather than any system copy.
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+    -DSimbody_DIR=/usr/local/lib/cmake/simbody
 cmake --build build -j"$(nproc)"
 
 echo

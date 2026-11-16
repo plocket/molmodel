@@ -1,10 +1,11 @@
 # Build directories
 build/
-third_party/gemmi-build/
-third_party/gemmi-install/
 
-# Vendored third-party source (downloaded by scripts/setup.sh or the Dockerfile)
-third_party/gemmi-0.6.2/
+# Vendored third-party source and build trees (downloaded by
+# scripts/setup.sh or the Dockerfile; see third_party/README.md)
+third_party/*
+
+!third_party/README.md
 
 # Local logs and OS artifacts
 logs/

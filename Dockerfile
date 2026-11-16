@@ -1,56 +1,68 @@
 # Container image for building and running molmodel.
 #
-# Replaces the previous Dockerfile, which built Simbody and OpenMM from
-# source and passed a GEMMI_PATH variable that molmodel's CMakeLists.txt
-# does not read. This version installs Simbody and OpenMM from apt and
-# builds gemmi 0.6.2 from source, matching the recipe in BUILDING.md.
+# Dependency policy:
+# - Simbody 3.9 and gemmi 0.6.2 are built from pinned source releases
+#   (docs/DECISION-simbody-3.9.md explains why 3.9).
+# - OpenMM comes from Ubuntu's repository. Pinning it is deferred until
+#   the Simbody pin has proven itself; see docs/PLAN-pinned-build.md.
 #
 # Build:
 #   docker build -t molmodel .
-# Run an example:
-#   docker run --rm molmodel ExampleTwoEthanes
+# Run the smoke test:
+#   docker run --rm molmodel
 # Open a shell:
 #   docker run -it --rm molmodel bash
 
 FROM ubuntu:24.04
 
+ARG SIMBODY_VERSION=3.9
 ARG GEMMI_VERSION=0.6.2
+ARG OPENMM_VERSION=8.1.2
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         build-essential cmake git curl ca-certificates \
         libblas-dev liblapack-dev zlib1g-dev \
-        libsimbody-dev libopenmm-dev
+        libopenmm-dev
 
-# Build gemmi in place under /opt/third_party so its headers and libraries
-# live in one tree, which is what molmodel's GEMMI_DIR expects.
-RUN mkdir -p /opt/third_party && \
-    curl -sL "https://github.com/project-gemmi/gemmi/archive/refs/tags/v${GEMMI_VERSION}.tar.gz" \
+# gemmi 0.6.2 from pinned source. molmodel requires 0.6.x; newer gemmi
+# does not compile against this code.
+RUN curl -sL "https://github.com/project-gemmi/gemmi/archive/refs/tags/v${GEMMI_VERSION}.tar.gz" \
         -o /tmp/gemmi.tar.gz && \
-    tar -xzf /tmp/gemmi.tar.gz -C /opt/third_party && \
+    mkdir /opt/gemmi && tar -xzf /tmp/gemmi.tar.gz -C /opt/gemmi --strip-components=1 && \
     rm /tmp/gemmi.tar.gz && \
-    cmake -S "/opt/third_party/gemmi-${GEMMI_VERSION}" \
-          -B "/opt/third_party/gemmi-${GEMMI_VERSION}" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DBUILD_SHARED_LIBS=ON \
-          -DUSE_PYTHON=OFF && \
-    cmake --build "/opt/third_party/gemmi-${GEMMI_VERSION}" -j"$(nproc)" && \
-    cmake --install "/opt/third_party/gemmi-${GEMMI_VERSION}" && \
+    cmake -S /opt/gemmi -B /opt/gemmi/build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=ON \
+        -DUSE_PYTHON=OFF && \
+    cmake --build /opt/gemmi/build -j"$(nproc)" && \
+    cmake --install /opt/gemmi/build
+
+# Simbody 3.9 from pinned source. Ubuntu's packaged Simbody (3.7) crashes
+# most of molmodel's test suite; see docs/DECISION-simbody-3.9.md.
+RUN curl -sL "https://github.com/simbody/simbody/archive/refs/tags/Simbody-${SIMBODY_VERSION}.tar.gz" \
+        -o /tmp/simbody.tar.gz && \
+    mkdir /opt/simbody && tar -xzf /tmp/simbody.tar.gz -C /opt/simbody --strip-components=1 && \
+    rm /tmp/simbody.tar.gz && \
+    cmake -S /opt/simbody -B /opt/simbody/build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_TESTING=OFF && \
+    cmake --build /opt/simbody/build -j"$(nproc)" && \
+    cmake --install /opt/simbody/build && \
     ldconfig
 
-# Copy the source in and build. GEMMI_DIR defaults to third_party/gemmi-0.6.2
-# inside the source tree (see CMakeLists.txt), so point it at the image's
-# copy instead.
+# molmodel. GEMMI_DIR points at the gemmi source tree, whose headers and
+# libraries CMakeLists.txt expects to find in place.
 WORKDIR /opt/molmodel
 COPY . /opt/molmodel
 RUN cmake -S . -B build \
-        -DGEMMI_DIR="/opt/third_party/gemmi-${GEMMI_VERSION}" \
+        -DGEMMI_DIR=/opt/gemmi \
         -DCMAKE_BUILD_TYPE=Release && \
     cmake --build build -j"$(nproc)" && \
     cmake --install build && \
     ldconfig
 
-ENV LD_LIBRARY_PATH=/usr/local/lib
-
-# Smoke test: run a program that does not need a visualizer.
+# Smoke test: a program that does not need a visualizer.
 CMD ["build/tests/TestEthane"]
