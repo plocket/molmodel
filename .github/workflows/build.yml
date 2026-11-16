@@ -1,0 +1,25 @@
+# Verifies the pinned build recipe on every push and pull request.
+# Fails when: a pinned tarball URL dies, a dependency update breaks the
+# build, or the test suite result changes.
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t molmodel .
+
+      - name: Smoke test
+        run: docker run --rm molmodel
+
+      - name: Test suite
+        run: |
+          docker run --rm molmodel bash -c "ctest --test-dir build --output-on-failure" | tee ctest.log
+          grep -E "95% tests passed" ctest.log

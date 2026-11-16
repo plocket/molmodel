@@ -78,5 +78,7 @@ state handling that only 3.9 permits without complaint.
   future work does not re-litigate them: TestPdb is molmodel's own bug,
   TestNoseHooverThermostat is a Simbody behavior change to investigate
   only if 0.2 tolerance matters for actual use.
-- OpenMM stays unpinned for now (apt's 8.1.2 works); pinning it is
-  deferred until the Simbody pin is proven in the Dockerfile.
+- OpenMM 8.6.1 (latest release) was pinned after verification: the
+  OpenMMPlugin source compiles against it and the test suite gives the
+  same 35/37 as with apt's 8.1.2. Its build requires Python 3 and
+  Doxygen even with wrappers and examples disabled.

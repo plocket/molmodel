@@ -13,15 +13,15 @@ docker run --rm molmodel          # runs a smoke-test program
 docker run -it --rm molmodel bash # shell with molmodel built and installed
 ```
 
-The image builds gemmi 0.6.2 and Simbody 3.9 from pinned source releases
-and takes OpenMM from Ubuntu's repository. See
-docs/DECISION-simbody-3.9.md for why Simbody is pinned.
+The image builds gemmi 0.6.2, Simbody 3.9, and OpenMM 8.6.1 from pinned
+source releases. See docs/DECISION-simbody-3.9.md for why Simbody is
+pinned.
 
 ### Option 2: Direct build on Debian/Ubuntu
 
 `scripts/setup.sh` does the same thing as the Dockerfile, natively:
-installs apt packages, fetches and builds gemmi 0.6.2 and Simbody 3.9
-under `third_party/`, then builds molmodel.
+installs apt packages, fetches and builds gemmi 0.6.2, Simbody 3.9, and
+OpenMM 8.6.1 under `third_party/`, then builds molmodel.
 
 ```bash
 ./scripts/setup.sh
@@ -31,8 +31,9 @@ By hand, the steps are:
 
 ```bash
 # 1. System packages
-sudo apt install -y build-essential cmake git curl \
-    libblas-dev liblapack-dev zlib1g-dev libopenmm-dev
+sudo apt install -y build-essential cmake git curl doxygen python3 \
+    libblas-dev liblapack-dev zlib1g-dev \
+    libxml2-dev libffi-dev libfftw3-dev
 
 # 2. gemmi 0.6.2, built in place under third_party/
 mkdir -p third_party
@@ -53,7 +54,17 @@ cmake -S third_party/simbody-Simbody-3.9 -B third_party/simbody-Simbody-3.9 \
 cmake --build third_party/simbody-Simbody-3.9 -j"$(nproc)"
 sudo cmake --install third_party/simbody-Simbody-3.9 && sudo ldconfig
 
-# 4. molmodel. GEMMI_DIR defaults to third_party/gemmi-0.6.2 in
+# 4. OpenMM 8.6.1 from source. Python wrappers and examples off; molmodel
+#    only needs the core library and plugin headers.
+curl -sL https://github.com/openmm/openmm/archive/refs/tags/8.6.1.tar.gz -o /tmp/openmm.tar.gz
+tar -xzf /tmp/openmm.tar.gz -C third_party/ && rm /tmp/openmm.tar.gz
+cmake -S third_party/openmm-8.6.1 -B third_party/openmm-8.6.1 \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DOPENMM_BUILD_EXAMPLES=OFF -DOPENMM_BUILD_PYTHON_WRAPPERS=OFF
+cmake --build third_party/openmm-8.6.1 -j"$(nproc)"
+sudo cmake --install third_party/openmm-8.6.1 && sudo ldconfig
+
+# 5. molmodel. GEMMI_DIR defaults to third_party/gemmi-0.6.2 in
 #    CMakeLists.txt; Simbody_DIR is passed explicitly so the freshly
 #    built 3.9 is used rather than any system copy.
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
@@ -64,10 +75,9 @@ sudo cmake --install build && sudo ldconfig   # optional
 
 ## Other Linux distributions or macOS
 
-The same steps apply, but the packages may have different names. OpenMM
-must come from somewhere (package manager or built from source). If you
-build from source, note that molmodel uses the CMake variable
-`GEMMI_DIR`.
+The same steps apply, but the packages may have different names. If you
+build OpenMM from source instead, note that molmodel uses the CMake
+variable `GEMMI_DIR` for gemmi.
 
 ### Finding the package names
 
@@ -75,28 +85,29 @@ Search your package manager's index; the search terms are the library names,
 not the tool names:
 
 ```bash
-dnf search openmm lapack    # Fedora/RHEL
-pacman -Ss openmm           # Arch
-brew search openmm lapack   # macOS (Homebrew)
+dnf search lapack blas    # Fedora/RHEL
+pacman -Ss lapack blas    # Arch
+brew search lapack        # macOS (Homebrew)
 ```
 
 or look them up on <https://pkgs.org>, which indexes package names across
 most RPM- and .deb-based distributions. What you are looking for, in terms
 of what each provides:
 
-- a C/C++ compiler and CMake (any recent versions)
+- a C/C++ compiler, CMake, Python 3, and Doxygen (any recent versions;
+  Doxygen and Python are needed by OpenMM's build)
 - BLAS and LAPACK (Simbody needs them at build time)
-- zlib
-- OpenMM — needs to include `OpenMM.h` and provide `libOpenMM`
+- zlib, libxml2, libffi, FFTW (OpenMM's build needs them)
 
-Simbody and gemmi are built from pinned source in every recipe above, so
-no packages are needed for them beyond BLAS/LAPACK/zlib.
+gemmi, Simbody, and OpenMM are all built from pinned source in every
+recipe above, so no packages are needed for them beyond the libraries
+listed.
 
 ## Versions this was verified with
 
 - Ubuntu (arm64), GCC 15.2, CMake 4.2
-- Simbody 3.9 (source, pinned), OpenMM 8.1.2 (apt), gemmi 0.6.2
-  (source, pinned), zlib 1.3.1
+- Simbody 3.9, OpenMM 8.6.1, gemmi 0.6.2 (all source, pinned),
+  zlib 1.3.1
 
 Details:
 
@@ -114,8 +125,9 @@ Details:
   Simbody_DIR falls back silently to a system Simbody.
 - **OpenMM is a hard dependency** (`find_package(OpenMM REQUIRED)`),
   even though most of molmodel does not use it. The OpenMM plugin is
-  always built. OpenMM is currently not pinned; pinning it is deferred
-  (docs/PLAN-pinned-build.md).
+  always built. OpenMM 8.6.1 is pinned and verified compatible with the
+  OpenMMPlugin source. Its build needs Python 3 and Doxygen present even
+  with wrappers and examples disabled.
 - **C++14** is set in CMakeLists.txt (`CMAKE_CXX_STANDARD 14`); any
   newer compiler that still defaults to a compatible standard works.
 
@@ -134,8 +146,9 @@ headless systems; that is expected and not counted above.
 
 ## Layout
 
-- `third_party/` — vendored gemmi and Simbody source and build trees
-  (downloaded by the script; not committed; see third_party/README.md)
+- `third_party/` — vendored gemmi, Simbody, and OpenMM source and
+  build trees (downloaded by the script; not committed; see
+  third_party/README.md)
 - `build/` — CMake build directory (not committed)
 - `scripts/setup.sh` — the one-command local build
 - `docs/` — decision and plan records

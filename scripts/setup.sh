@@ -3,10 +3,11 @@
 # Requires: sudo apt, git, curl, a C++ compiler.
 # See BUILDING.md for what this does and for non-Debian alternatives.
 #
-# Dependency policy (matches the Dockerfile):
-# - Simbody 3.9 and gemmi 0.6.2 from pinned source releases
-#   (docs/DECISION-simbody-3.9.md explains why 3.9)
-# - OpenMM from apt (pinning deferred, see docs/PLAN-pinned-build.md)
+# Dependency policy (matches the Dockerfile): all three dependencies
+# from pinned source releases:
+# - gemmi 0.6.2 (required, newer does not compile)
+# - Simbody 3.9 (docs/DECISION-simbody-3.9.md)
+# - OpenMM 8.6.1 (verified compatible with the OpenMMPlugin source)
 
 set -euo pipefail
 
@@ -14,13 +15,14 @@ cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
 SIMBODY_VERSION=3.9
 GEMMI_VERSION=0.6.2
+OPENMM_VERSION=8.6.1
 
 # 1. System packages
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential cmake git curl \
+    build-essential cmake git curl doxygen python3 \
     libblas-dev liblapack-dev zlib1g-dev \
-    libopenmm-dev
+    libxml2-dev libffi-dev libfftw3-dev
 
 # 2. gemmi 0.6.2 from pinned source (molmodel requires 0.6.x)
 if [ ! -d "third_party/gemmi-${GEMMI_VERSION}" ]; then
@@ -56,13 +58,31 @@ cmake --build "third_party/simbody-Simbody-${SIMBODY_VERSION}" -j"$(nproc)"
 sudo cmake --install "third_party/simbody-Simbody-${SIMBODY_VERSION}"
 sudo ldconfig
 
-# 4. Configure and build molmodel.
+# 4. OpenMM 8.6.1 from pinned source. Python wrappers and examples off;
+#    molmodel only needs the core library and plugin headers.
+if [ ! -d "third_party/openmm-${OPENMM_VERSION}" ]; then
+    mkdir -p third_party
+    curl -sL "https://github.com/openmm/openmm/archive/refs/tags/${OPENMM_VERSION}.tar.gz" \
+        -o /tmp/openmm-${OPENMM_VERSION}.tar.gz
+    tar -xzf /tmp/openmm-${OPENMM_VERSION}.tar.gz -C third_party/
+    rm /tmp/openmm-${OPENMM_VERSION}.tar.gz
+fi
+cmake -S "third_party/openmm-${OPENMM_VERSION}" \
+      -B "third_party/openmm-${OPENMM_VERSION}" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DOPENMM_BUILD_EXAMPLES=OFF \
+    -DOPENMM_BUILD_PYTHON_WRAPPERS=OFF
+cmake --build "third_party/openmm-${OPENMM_VERSION}" -j"$(nproc)"
+sudo cmake --install "third_party/openmm-${OPENMM_VERSION}"
+sudo ldconfig
+
+# 5. Configure and build molmodel.
 # GEMMI_DIR defaults to third_party/gemmi-0.6.2 in CMakeLists.txt.
 # Simbody_DIR is passed explicitly so the freshly built 3.9 is used
 # rather than any system copy.
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-    -DSimbody_DIR=/usr/local/lib/cmake/simbody
-cmake --build build -j"$(nproc)"
+    -DSimbody_DIR=/usr/local/lib/cmake/simbodycmake --build build -j"$(nproc)"
 
 echo
 echo "Build finished. To install system-wide (optional):"

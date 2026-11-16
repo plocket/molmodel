@@ -3,8 +3,9 @@
 Status: segfault investigation done; Simbody 3.9 chosen
 (docs/DECISION-simbody-3.9.md). Done: CMake version check, pinned
 Dockerfile (verified with docker build/run), setup.sh rewritten to match
-Dockerfile policy, BUILDING.md updated. Not started: CI workflow,
-OpenMM pinning.
+Dockerfile policy, BUILDING.md updated, OpenMM 8.6.1 pinned (2025-11,
+verified: plugin compiles, same 35/37 suite result). Not started: CI
+workflow.
 
 ## Segfault verification
 
@@ -164,5 +165,5 @@ scripts/setup.sh and BUILDING.md stays valid throughout.
 - Which Simbody version actually fixes the State-copy segfaults, if
   any? Only step 3 answers this.
 - OpenMM version compatibility with the OpenMMPlugin source in this
-  repo. If the newest OpenMM breaks the plugin build, pin an older one
-  (the old repo's Dockerfile used 7.7.0) and note it.
+  repo. ANSWERED 2025-11: OpenMM 8.6.1 works (plugin compiles, 35/37
+  tests, same as apt 8.1.2). Pinned in Dockerfile and setup.sh.

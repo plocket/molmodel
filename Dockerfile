@@ -1,10 +1,14 @@
 # Container image for building and running molmodel.
 #
-# Dependency policy:
-# - Simbody 3.9 and gemmi 0.6.2 are built from pinned source releases
-#   (docs/DECISION-simbody-3.9.md explains why 3.9).
-# - OpenMM comes from Ubuntu's repository. Pinning it is deferred until
-#   the Simbody pin has proven itself; see docs/PLAN-pinned-build.md.
+# Dependency policy: all three dependencies are built from pinned
+# source releases.
+# - gemmi 0.6.2 is required; newer gemmi does not compile against this
+#   code
+# - Simbody 3.9 per docs/DECISION-simbody-3.9.md (Ubuntu's 3.7 crashes
+#   most tests)
+# - OpenMM 8.6.1, verified compatible with the OpenMMPlugin source
+#   (2025-11); apt's 8.1.2 also worked but is unpinned, so source is
+#   used for reproducibility
 #
 # Build:
 #   docker build -t molmodel .
@@ -17,13 +21,13 @@ FROM ubuntu:24.04
 
 ARG SIMBODY_VERSION=3.9
 ARG GEMMI_VERSION=0.6.2
-ARG OPENMM_VERSION=8.1.2
+ARG OPENMM_VERSION=8.6.1
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        build-essential cmake git curl ca-certificates \
+        build-essential cmake git curl ca-certificates doxygen python3 \
         libblas-dev liblapack-dev zlib1g-dev \
-        libopenmm-dev
+        libxml2-dev libffi-dev libfftw3-dev
 
 # gemmi 0.6.2 from pinned source. molmodel requires 0.6.x; newer gemmi
 # does not compile against this code.
@@ -51,6 +55,21 @@ RUN curl -sL "https://github.com/simbody/simbody/archive/refs/tags/Simbody-${SIM
         -DBUILD_TESTING=OFF && \
     cmake --build /opt/simbody/build -j"$(nproc)" && \
     cmake --install /opt/simbody/build && \
+    ldconfig
+
+# OpenMM 8.6.1 from pinned source. Python wrappers and examples are off;
+# molmodel only needs the core library and plugin headers.
+RUN curl -sL "https://github.com/openmm/openmm/archive/refs/tags/${OPENMM_VERSION}.tar.gz" \
+        -o /tmp/openmm.tar.gz && \
+    mkdir /opt/openmm && tar -xzf /tmp/openmm.tar.gz -C /opt/openmm --strip-components=1 && \
+    rm /tmp/openmm.tar.gz && \
+    cmake -S /opt/openmm -B /opt/openmm/build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DOPENMM_BUILD_EXAMPLES=OFF \
+        -DOPENMM_BUILD_PYTHON_WRAPPERS=OFF && \
+    cmake --build /opt/openmm/build -j"$(nproc)" && \
+    cmake --install /opt/openmm/build && \
     ldconfig
 
 # molmodel. GEMMI_DIR points at the gemmi source tree, whose headers and
