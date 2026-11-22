@@ -472,6 +472,10 @@ public:
 
     size_t getNumChains() const {return chains.size();}
     const PdbChain& getChain(Pdb::ChainIndex chainIx) const {
+        if (chainIx < 0 || chainIx >= (Pdb::ChainIndex::difference_type)chains.size())
+            throw std::runtime_error("PdbModel::getChain(): chain index out of range (model has "
+                                     + std::to_string(chains.size()) + " chains). The PDB/mmCIF input "
+                                     "was likely missing, empty, or unreadable.");
         return chains[chainIx];
     }
     const PdbChain& getChain(String chainId) const;
@@ -552,6 +556,10 @@ public:
 
     size_t getNumModels() const {return models.size();}
     const PdbModel& getModel(Pdb::ModelIndex modelIx) const {
+        if (modelIx < 0 || modelIx >= (Pdb::ModelIndex::difference_type)models.size())
+            throw std::runtime_error("PdbStructure::getModel(): model index out of range (structure has "
+                                     + std::to_string(models.size()) + " models). The PDB/mmCIF input "
+                                     "was likely missing, empty, or unreadable.");
         return models[modelIx];
     }
 

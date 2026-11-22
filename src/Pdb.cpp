@@ -962,6 +962,11 @@ PdbStructure::PdbStructure(const std::string& fileName, const std::string& chain
 
 PdbStructure::PdbStructure(std::istream &input, const InputType iType, const std::string &chainsPrefix)
 {
+    if (!input.good() && input.eof()) {
+        // A stream that was already failed/explicitly closed before we got here
+        throw UnrecoverableMolmodelError("PdbStructure: input stream is not readable "
+            "(the file may be missing or was not successfully opened).");
+    }
     if (iType == InputType::CIF) {
         auto doc = gemmi::cif::read_istream(input, 512, "cif_stream");
         initialize(gemmiStructFromDoc(doc), chainsPrefix);
@@ -973,6 +978,8 @@ PdbStructure::PdbStructure(std::istream &input, const InputType iType, const std
 	    pdb += buf + '\n';;
 	}
         initialize(gemmi::read_pdb_string(pdb, ""), chainsPrefix);
+    } else {
+        throw UnrecoverableMolmodelError("PdbStructure: unknown input type (neither CIF nor PDB).");
     }
 }
 
@@ -987,6 +994,17 @@ const PdbAtom& PdbStructure::getAtom(String atomName, PdbResidueId residueId, St
 }
 
 void PdbStructure::initialize(const gemmi::Structure& gs, const std::string &chainsPrefix) {
+    // gemmi can return a structure with zero models, or a single model with
+    // zero chains, when the input is empty or unparseable — e.g. a missing,
+    // unreadable, or content-free file/stream. Nothing useful can be built
+    // from that, so fail immediately with a cause-oriented message.
+    size_t numChains = 0;
+    for (const auto &mo : gs.models) numChains += mo.chains.size();
+    if (gs.models.empty() || numChains == 0) {
+        throw UnrecoverableMolmodelError("PdbStructure: input contained no structural data "
+            "(no models with chains). The input is likely missing, empty, unreadable, "
+            "or not in a recognized PDB/mmCIF format.");
+    }
     models.reserve(models.size() + gs.models.size());
     //================================================ For each model
     for ( const auto &mo : gs.models )
