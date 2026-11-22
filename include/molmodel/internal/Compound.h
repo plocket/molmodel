@@ -1797,7 +1797,7 @@ public:
         friend class ResidueInfo;
 
         AtomInfo(Compound::AtomIndex index, Compound::AtomName name)
-            : biopolymerAtomIndex(index), pdbAtomName(std::move(name))
+            : biopolymerAtomIndex(index), pdbAtomName(name)
         {
             synonyms.insert(name);
         }

@@ -101,6 +101,7 @@ BiotypeIndex SimTK_MOLMODEL_EXPORT getBiotypeIndex(
     {
         // Atom type never has leading digit found on hydrogen instances
         int startPos = atomI->find_first_not_of("0123456789");
+        if (startPos == (int)std::string::npos) continue; // skip empty or all-digit names
 
         moreAtomNames.insert(atomI->substr(startPos)); // First atom name is the standard one
 
@@ -2614,6 +2615,11 @@ bool Biopolymer::assignResidueBiotypes(ResidueInfo::Index r, Ordinality::Residue
         if (atom.getBiotypeIndex().isValid()) continue;
         const std::set<Compound::AtomName> atomNames = residue.getAtomInfo(a).getNames();
         BiotypeIndex index = getBiotypeIndex(resNames, atomNames, ordinality);
+        // Fall back on mid-chain (Ordinality::Any) biotypes for atoms that have
+        // no ordinality-specific biotype, e.g. side chain atoms of terminal
+        // residues, which share their biotypes with mid-chain residues.
+        if (!index.isValid() && ordinality != Ordinality::Any)
+            index = getBiotypeIndex(resNames, atomNames, Ordinality::Any);
         if (index.isValid())
             atom.setBiotypeIndex(index);
         else
@@ -2956,14 +2962,51 @@ void Protein::loadFromPdbChain(const PdbChain& pdbChain, SimTK::Real targetRms)
 {
 	setPdbChainId( pdbChain.getChainId() );
 
+	// Make sure the standard biotypes (including the charged terminal ones) are defined
+	Biotype::initializePopularBiotypes();
+
     // 1) Link canonical residue types into a chain
     // (the conformation will not yet match the pdbChain though)
+    const int numResidues = pdbChain.getNumResidues();
     for (Pdb::ResidueIndex resIx(0); resIx < pdbChain.getNumResidues();  ++resIx)
     {
         const PdbResidue& pdbResidue = pdbChain.getResidue(resIx);
         
         AminoAcidResidue newResidue = AminoAcidResidue::create(pdbResidue);
-        newResidue.assignBiotypes();
+
+        // A residue built as a mid-chain residue has a dangling bond center on
+        // its backbone nitrogen (unprotonated, neutral N-terminus) and, at the
+        // end of the chain, a dangling carbonyl carbon (aldehyde-like C-terminus).
+        // Give the first and last residues their chemically correct charged
+        // termini instead: NH3+ and COO-. A single-residue chain gets both
+        // treatments, i.e. a zwitterion.
+        const bool isFirst = (numResidues == 1) || (resIx == Pdb::ResidueIndex(0));
+        const bool isLast  = (numResidues == 1) || (resIx == Pdb::ResidueIndex(numResidues - 1));
+        if (isFirst) newResidue.protonateNTerminus();
+        if (isLast)  newResidue.deprotonateCTerminus();
+
+        // Assign biotypes appropriate for the residue's position in the chain,
+        // so that terminal atoms receive their charged terminal biotypes.
+        // (assignTerminalBackboneBiotypes() overrides any mid-chain biotypes
+        // that the residue's constructor may have pre-assigned.)
+        const String& tlc = pdbResidue.getName();
+        if (isFirst && isLast) {
+            // Single-residue chain: charged at both ends
+            newResidue.assignBiotypes(Ordinality::Initial);
+            AminoAcidResidue::assignTerminalBackboneBiotypes(newResidue, tlc, Ordinality::Initial);
+            AminoAcidResidue::assignTerminalBackboneBiotypes(newResidue, tlc, Ordinality::Final);
+        }
+        else if (isFirst) {
+            newResidue.assignBiotypes(Ordinality::Initial);
+            AminoAcidResidue::assignTerminalBackboneBiotypes(newResidue, tlc, Ordinality::Initial);
+        }
+        else if (isLast) {
+            newResidue.assignBiotypes(Ordinality::Final);
+            AminoAcidResidue::assignTerminalBackboneBiotypes(newResidue, tlc, Ordinality::Final);
+        }
+        else
+            newResidue.assignBiotypes();
+
         newResidue.setPdbChainId( pdbChain.getChainId() );
         
         const String& residueName = String(pdbResidue.getName()) + String(pdbResidue.getPdbResidueNumber());

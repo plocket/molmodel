@@ -206,6 +206,118 @@ public:
         return *this;
     }
 
+    /**
+     * \brief Convert the backbone amino nitrogen into a positively charged
+     * (NH3+) N-terminal ammonium group, by adding two more hydrogens.
+     *
+     * A residue constructed in the usual way has a dangling bond center on its
+     * backbone nitrogen, suitable for attachment of the preceding residue.
+     * Calling this method frees that bond center and uses it (plus one new
+     * bond center) to attach two additional protons, leaving the nitrogen
+     * with four bonds: CA plus three hydrogens. This is the chemically correct
+     * state of an N-terminal amino acid at neutral pH.
+     *
+     * The new hydrogen atoms are named "2H" and "3H" (the pre-existing one is
+     * "H", synonym "HN"). Each is assigned the charged N-terminal ammonium
+     * hydrogen Biotype, e.g. ("ALA", "HN", Ordinality::Initial), so that it
+     * receives the correct partial charge.
+     *
+     * Intended to be called on the first residue of a chain, before it is
+     * appended to a Biopolymer. Works for proline as well, which ends up with
+     * two N-terminal hydrogens (a protonated iminium), as it should.
+     */
+    AminoAcidResidue& protonateNTerminus() {
+        static const mdunits::Length  H_Ndistance = 0.1010;
+        static const Angle TetrahedralAngle = 109.47*Deg2Rad;
+
+        // Free the nitrogen's dangling peptide bond center ("bondN") for use by a hydrogen
+        convertInboardBondCenterToOutboard();
+
+        // Fourth bond center on the nitrogen, arranged tetrahedrally with respect to the first two
+        addRightHandedBondCenter("bondN4", "N", TetrahedralAngle, TetrahedralAngle);
+
+        // Two additional protons complete the NH3+ ammonium group.
+        // Note: "bondN4" was registered at residue level by addRightHandedBondCenter()
+        // above, so it is addressed by its plain name rather than the "N/bondN4" path.
+        bondAtom(UnivalentAtom("2H", Element::getBySymbol("H")), "N/bond1", H_Ndistance);
+        bondAtom(UnivalentAtom("3H", Element::getBySymbol("H")), "bondN4", H_Ndistance);
+
+        // Assign the charged N-terminal ammonium hydrogen Biotype (the same one
+        // used by the pre-existing "HN" hydrogen) directly to the new hydrogens,
+        // so that they receive the correct partial charges. Requires that the
+        // standard biotypes have been initialized (e.g. via
+        // Biotype::initializePopularBiotypes() or loading a force field).
+        if (Biotype::exists(getThreeLetterCode(), "HN", Ordinality::Initial)) {
+            const BiotypeIndex hnBiotypeIx =
+                Biotype::get(getThreeLetterCode(), "HN", Ordinality::Initial).getIndex();
+            setBiotypeIndex("2H", hnBiotypeIx);
+            setBiotypeIndex("3H", hnBiotypeIx);
+        }
+
+        return *this;
+    }
+
+    /**
+     * \brief Convert the backbone carboxyl carbon into a negatively charged
+     * (COO-) C-terminal carboxylate group, by adding an "OXT" oxygen.
+     *
+     * A residue constructed in the usual way has a dangling bond center on its
+     * carbonyl carbon ("bondC"), suitable for attachment of the next residue.
+     * This method bonds a second carbonyl oxygen there instead, leaving the
+     * carbon with three bonds: CA, O, and OXT. This is the chemically correct
+     * state of a C-terminal amino acid at neutral pH.
+     *
+     * The new oxygen atom is named "OXT", matching the PDB standard, so that
+     * assignBiotypes() will assign it the charged C-terminal carboxylate
+     * Biotype, e.g. ("ALA", "OXT", Ordinality::Final).
+     *
+     * Intended to be called on the last residue of a chain, before it is
+     * appended to a Biopolymer.
+     */
+    AminoAcidResidue& deprotonateCTerminus() {
+        static const mdunits::Length  C_Odistance = 0.1229;
+
+        // Bond a second carbonyl oxygen at the dangling peptide bond center,
+        // completing the carboxylate group
+        bondAtom(UnivalentAtom("OXT", Element::getBySymbol("O")), "bondC", C_Odistance);
+
+        return *this;
+    }
+
+    /**
+     * \brief Assign the charged terminal backbone Biotypes to this residue\'s
+     * backbone atoms, e.g. ("ALA", "N", Ordinality::Initial) for an N-terminal
+     * residue or ("ALA", "OXT", Ordinality::Final) for a C-terminal one.
+     *
+     * Some residue constructors pre-assign mid-chain (Ordinality::Any) biotypes
+     * to their atoms; because biotype assignment normally retains previously
+     * assigned biotypes, terminal residues built from those residues would
+     * otherwise keep their mid-chain (uncharged) backbone biotypes. This method
+     * overrides the backbone atoms (N, CA, C, O, OXT, HN, HA) with the
+     * biotypes for the given terminal ordinality, leaving side chain atoms
+     * untouched. Atoms that do not exist in this residue, or that have no
+     * terminal biotype defined, are skipped.
+     *
+     * Requires that the standard biotypes have been initialized.
+     */
+    static void assignTerminalBackboneBiotypes(
+        AminoAcidResidue& residue, ///< residue to update
+        const String& threeLetterCode, ///< three letter code used to name the Biotypes, e.g. "ALA"
+        Ordinality::Residue ordinality ///< Ordinality::Initial or Ordinality::Final
+        )
+    {
+        static const char* const backboneAtomNames[] = {"N", "CA", "C", "O", "OXT", "HN", "HA"};
+        for (const char* atomName : backboneAtomNames) {
+            if (! residue.hasAtom(atomName)) continue;
+            if (! Biotype::exists(threeLetterCode, atomName, ordinality)) continue;
+            const Biotype& biotype = Biotype::get(threeLetterCode, atomName, ordinality);
+            // Biotype::get() falls back on Ordinality::Any; only override with
+            // an exact ordinality match
+            if (biotype.getOrdinality() != ordinality) continue;
+            residue.setBiotypeIndex(atomName, biotype.getIndex());
+        }
+    }
+
     // Make intermediate classes inner classes of AminoAcidResidue
     // to avoid registration order problems in boost.python/Py++ wrapping
     class HNAminoAcidResidue;
@@ -1084,7 +1196,36 @@ protected:
         {
             AminoAcidResidue residue = AminoAcidResidue::create(seq[resi]);
             residue.setPdbResidueNumber(resi + 1);
-            residue.assignBiotypes();
+
+            // Without end caps, a mid-chain-style first/last residue would be
+            // chemically incorrect (unprotonated N-terminus, aldehyde-like
+            // C-terminus). Give the terminal residues their chemically correct
+            // charged termini instead: NH3+ and COO-. A single-residue chain
+            // gets both treatments, i.e. a zwitterion.
+            if (!addEndCaps) { 
+                const bool isFirstRes = (resi == 0);
+                const bool isLastRes = (resi == (int)seq.size() - 1);
+                if (isFirstRes) residue.protonateNTerminus();
+                if (isLastRes)  residue.deprotonateCTerminus();
+                const String& tlc = residue.getThreeLetterCode();
+                if (isFirstRes && isLastRes) { 
+                    residue.assignBiotypes(Ordinality::Initial);
+                    AminoAcidResidue::assignTerminalBackboneBiotypes(residue, tlc, Ordinality::Initial);
+                    AminoAcidResidue::assignTerminalBackboneBiotypes(residue, tlc, Ordinality::Final);
+                }
+                else if (isFirstRes) { 
+                    residue.assignBiotypes(Ordinality::Initial);
+                    AminoAcidResidue::assignTerminalBackboneBiotypes(residue, tlc, Ordinality::Initial);
+                }
+                else if (isLastRes) { 
+                    residue.assignBiotypes(Ordinality::Final);
+                    AminoAcidResidue::assignTerminalBackboneBiotypes(residue, tlc, Ordinality::Final);
+                }
+                else
+                    residue.assignBiotypes();
+            }
+            else
+                residue.assignBiotypes();
 
             // Name residue subcompound after its number in the sequence
             // name must be unique within the protein

@@ -2125,149 +2125,224 @@ static void nowDoSecondHalf(DuMMForceFieldSubsystem& dumm) {
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(503), Biotype::get("GLY", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(504), Biotype::get("GLY", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(505), Biotype::get("GLY", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("GLY", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "GLY", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(505), Biotype::get("GLY", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(506), Biotype::get("GLY", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(507), Biotype::get("ALA", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(508), Biotype::get("ALA", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(509), Biotype::get("ALA", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(510), Biotype::get("ALA", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(511), Biotype::get("ALA", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("ALA", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "ALA", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(511), Biotype::get("ALA", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(512), Biotype::get("ALA", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(513), Biotype::get("VAL", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(514), Biotype::get("VAL", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(515), Biotype::get("VAL", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(516), Biotype::get("VAL", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(517), Biotype::get("VAL", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("VAL", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "VAL", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(517), Biotype::get("VAL", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(518), Biotype::get("VAL", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(519), Biotype::get("LEU", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(520), Biotype::get("LEU", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(521), Biotype::get("LEU", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(522), Biotype::get("LEU", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(523), Biotype::get("LEU", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("LEU", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "LEU", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(523), Biotype::get("LEU", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(524), Biotype::get("LEU", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(525), Biotype::get("ILE", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(526), Biotype::get("ILE", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(527), Biotype::get("ILE", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(528), Biotype::get("ILE", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(529), Biotype::get("ILE", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("ILE", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "ILE", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(529), Biotype::get("ILE", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(530), Biotype::get("ILE", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(531), Biotype::get("SER", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(532), Biotype::get("SER", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(533), Biotype::get("SER", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(534), Biotype::get("SER", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(535), Biotype::get("SER", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("SER", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "SER", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(535), Biotype::get("SER", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(536), Biotype::get("SER", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(537), Biotype::get("THR", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(538), Biotype::get("THR", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(539), Biotype::get("THR", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(540), Biotype::get("THR", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(541), Biotype::get("THR", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("THR", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "THR", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(541), Biotype::get("THR", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(542), Biotype::get("THR", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(543), Biotype::get("CYS (-SH)", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(544), Biotype::get("CYS (-SH)", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(545), Biotype::get("CYS (-SH)", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(546), Biotype::get("CYS (-SH)", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(547), Biotype::get("CYS (-SH)", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("CYS (-SH)", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "CYS (-SH)", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(547), Biotype::get("CYS (-SH)", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(548), Biotype::get("CYS (-SH)", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(549), Biotype::get("CYS (-SS)", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(550), Biotype::get("CYS (-SS)", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(551), Biotype::get("CYS (-SS)", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(552), Biotype::get("CYS (-SS)", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(553), Biotype::get("CYS (-SS)", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("CYS (-SS)", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "CYS (-SS)", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(553), Biotype::get("CYS (-SS)", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(554), Biotype::get("CYS (-SS)", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(555), Biotype::get("PRO", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(556), Biotype::get("PRO", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(557), Biotype::get("PRO", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(558), Biotype::get("PRO", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("PRO", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "PRO", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(558), Biotype::get("PRO", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(559), Biotype::get("PRO", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(560), Biotype::get("PHE", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(561), Biotype::get("PHE", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(562), Biotype::get("PHE", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(563), Biotype::get("PHE", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(564), Biotype::get("PHE", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("PHE", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "PHE", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(564), Biotype::get("PHE", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(565), Biotype::get("PHE", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(566), Biotype::get("TYR", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(567), Biotype::get("TYR", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(568), Biotype::get("TYR", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(569), Biotype::get("TYR", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(570), Biotype::get("TYR", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("TYR", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "TYR", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(570), Biotype::get("TYR", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(571), Biotype::get("TYR", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(572), Biotype::get("TRP", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(573), Biotype::get("TRP", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(574), Biotype::get("TRP", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(575), Biotype::get("TRP", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(576), Biotype::get("TRP", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("TRP", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "TRP", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(576), Biotype::get("TRP", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(577), Biotype::get("TRP", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(578), Biotype::get("HIS (+)", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(579), Biotype::get("HIS (+)", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(580), Biotype::get("HIS (+)", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(581), Biotype::get("HIS (+)", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(582), Biotype::get("HIS (+)", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("HIS (+)", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "HIS (+)", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(582), Biotype::get("HIS (+)", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(583), Biotype::get("HIS (+)", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(584), Biotype::get("HIS (HD)", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(585), Biotype::get("HIS (HD)", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(586), Biotype::get("HIS (HD)", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(587), Biotype::get("HIS (HD)", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(588), Biotype::get("HIS (HD)", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("HIS (HD)", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "HIS (HD)", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(588), Biotype::get("HIS (HD)", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(589), Biotype::get("HIS (HD)", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(590), Biotype::get("HIS (HE)", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(591), Biotype::get("HIS (HE)", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(592), Biotype::get("HIS (HE)", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(593), Biotype::get("HIS (HE)", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(594), Biotype::get("HIS (HE)", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("HIS (HE)", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "HIS (HE)", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(594), Biotype::get("HIS (HE)", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(595), Biotype::get("HIS (HE)", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(596), Biotype::get("ASP", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(597), Biotype::get("ASP", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(598), Biotype::get("ASP", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(599), Biotype::get("ASP", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(600), Biotype::get("ASP", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("ASP", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "ASP", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(600), Biotype::get("ASP", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(601), Biotype::get("ASP", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(602), Biotype::get("ASN", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(603), Biotype::get("ASN", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(604), Biotype::get("ASN", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(605), Biotype::get("ASN", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(606), Biotype::get("ASN", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("ASN", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "ASN", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(606), Biotype::get("ASN", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(607), Biotype::get("ASN", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(608), Biotype::get("GLU", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(609), Biotype::get("GLU", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(610), Biotype::get("GLU", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(611), Biotype::get("GLU", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(612), Biotype::get("GLU", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("GLU", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "GLU", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(612), Biotype::get("GLU", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(613), Biotype::get("GLU", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(614), Biotype::get("GLN", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(615), Biotype::get("GLN", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(616), Biotype::get("GLN", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(617), Biotype::get("GLN", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(618), Biotype::get("GLN", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("GLN", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "GLN", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(618), Biotype::get("GLN", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(619), Biotype::get("GLN", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(620), Biotype::get("MET", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(621), Biotype::get("MET", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(622), Biotype::get("MET", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(623), Biotype::get("MET", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(624), Biotype::get("MET", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("MET", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "MET", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(624), Biotype::get("MET", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(625), Biotype::get("MET", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(626), Biotype::get("LYS", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(627), Biotype::get("LYS", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(628), Biotype::get("LYS", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(629), Biotype::get("LYS", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(630), Biotype::get("LYS", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("LYS", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "LYS", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(630), Biotype::get("LYS", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(631), Biotype::get("LYS", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(632), Biotype::get("ARG", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(633), Biotype::get("ARG", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(634), Biotype::get("ARG", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(635), Biotype::get("ARG", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(636), Biotype::get("ARG", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("ARG", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "ARG", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(636), Biotype::get("ARG", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(637), Biotype::get("ARG", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(638), Biotype::get("ORN", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(639), Biotype::get("ORN", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(640), Biotype::get("ORN", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(641), Biotype::get("ORN", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(642), Biotype::get("ORN", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("ORN", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "ORN", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(642), Biotype::get("ORN", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(643), Biotype::get("ORN", "HA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(644), Biotype::get("AIB", "N", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(645), Biotype::get("AIB", "CA", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(646), Biotype::get("AIB", "C", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(647), Biotype::get("AIB", "HN", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(648), Biotype::get("AIB", "OXT", Ordinality::Final).getIndex());
+    if (! Biotype::exists("AIB", "O", Ordinality::Final) )
+        Biotype::defineBiotype(Element::getBySymbol("O"), 1, "AIB", "O", Ordinality::Final);
+    dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(648), Biotype::get("AIB", "O", Ordinality::Final).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(1001), Biotype::get("Adenosine", "O5'", Ordinality::Any).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(1002), Biotype::get("Adenosine", "C5'", Ordinality::Any).getIndex());
     dumm.setBiotypeChargedAtomType(DuMM::ChargedAtomTypeIndex(1003), Biotype::get("Adenosine", "H5'1", Ordinality::Any).getIndex());

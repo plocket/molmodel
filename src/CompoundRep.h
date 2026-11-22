@@ -2546,6 +2546,12 @@ public:
 
             // Loop over residue names and atom names until a match is found
             BiotypeIndex index = getBiotypeIndex(synonyms, atomNames, ordinality);
+            // Fall back on mid-chain (Ordinality::Any) biotypes for atoms that
+            // have no ordinality-specific biotype, e.g. side chain atoms of
+            // terminal residues, which share their biotypes with mid-chain
+            // residues.
+            if (!index.isValid() && ordinality != Ordinality::Any)
+                index = getBiotypeIndex(synonyms, atomNames, Ordinality::Any);
             if (index.isValid()) {
                 atom.setBiotypeIndex(index);
             }
